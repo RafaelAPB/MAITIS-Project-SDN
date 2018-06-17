@@ -1,0 +1,51 @@
+---
+- hosts: opendaylights
+  gather_facts: yes
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: update
+      shell: sudo apt-get update
+
+    - name: jre
+      apt: name={{item}} update_cache=yes state=installed
+      with_items:
+        - default-jre-headless
+
+    - name: bash
+      shell: echo "JAVA_HOME=/usr/lib/jvm/default-java" >> ~/.bashrc
+
+    - name: download
+      get_url:
+        url: https://nexus.opendaylight.org/content/groups/public/org/opendaylight/integration/distribution-karaf/0.4.0-Beryllium/distribution-karaf-0.4.0-Beryllium.tar.gz
+        dest: /etc/
+
+    - name: Extract foo.tgz into /var/lib/foo
+      unarchive:
+        src: /etc/distribution-karaf-0.4.0-Beryllium.tar.gz
+        dest: /etc/
+
+- hosts: opendaylights
+  gather_facts: yes
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: update
+      shell: sudo apt-get update
+
+    - name: jre
+      apt: name={{item}} update_cache=yes state=installed
+      with_items:
+        - default-jre-headless
+
+    - name: bashrc update
+      shell: echo "JAVA_HOME=/usr/lib/jvm/default-java" >> ~/.bashrc
+
+    - name: provide distribution-karaf
+      shell: wget https://nexus.opendaylight.org/content/groups/public/org/opendaylight/integration/distribution-karaf/0.4.0-Beryllium/distribution-karaf-0.4.0-Beryllium.tar.gz
+
+    - name: write /etc/distribution-karaf
+      template: src=templates/distribution-karaf-0.4.0-Beryllium.tar.gz dest=/etc/
+
+    - name: tar
+      shell: tar -xvf distribution-karaf-0.4.0-Beryllium.tar.gz
